@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/akhil/dynamodb-go-crud-yt/utils/env"
 	"strconv"
+
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/utils/env"
 )
 
 type Config struct {

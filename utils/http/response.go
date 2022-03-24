@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -32,7 +31,7 @@ func (resp *response) sendResponse(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(resp.Status)
 	_, _ = w.Write(resp.bytes())
-	log.Println(resp.string())
+	// log.Println(resp.string())
 }
 
 // 200

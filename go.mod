@@ -1,9 +1,10 @@
-module github.com/akhil/dynamodb-go-crud-yt
+module github.com/Luis-Miguel-BL/go-dynamodb-crud
 
 go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.43.10
+	github.com/fatih/structs v1.1.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/cors v1.2.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0

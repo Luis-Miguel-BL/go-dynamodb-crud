@@ -1,10 +1,9 @@
 package routes
 
 import (
-	ServerConfig "github.com/akhil/dynamodb-go-crud-yt/config"
-	HealthHandler "github.com/akhil/dynamodb-go-crud-yt/internal/controllers/health"
-	ProductHandler "github.com/akhil/dynamodb-go-crud-yt/internal/controllers/product"
-	"github.com/akhil/dynamodb-go-crud-yt/internal/repository/adapter"
+	ServerConfig "github.com/Luis-Miguel-BL/go-dynamodb-crud/config"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/http/controllers"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/repositories"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -21,11 +20,11 @@ func NewRouter() *Router {
 	}
 }
 
-func (r *Router) SetRouters(repository adapter.Interface) *chi.Mux {
+func (r *Router) SetRouters(emailScoreRepository repositories.EmailScoreRepository, heathRepository repositories.HealthRepository) *chi.Mux {
 	r.setConfigsRouters()
 
-	r.RouterHealth(repository)
-	r.RouterProduct(repository)
+	r.RouterEmailScore(emailScoreRepository)
+	r.RouterHealth(heathRepository)
 
 	return r.router
 }
@@ -39,23 +38,21 @@ func (r *Router) setConfigsRouters() {
 	r.EnableRealIP()
 }
 
-func (r *Router) RouterHealth(repository adapter.Interface) {
-	handler := HealthHandler.NewHandler(repository)
+func (r *Router) RouterHealth(repository repositories.HealthRepository) {
+	controller := controllers.NewHealthController(repository)
 
 	r.router.Route("/health", func(route chi.Router) {
-		route.Get("/", handler.Get)
+		route.Get("/", controller.Get)
 	})
 }
 
-func (r *Router) RouterProduct(repository adapter.Interface) {
-	handler := ProductHandler.NewHandler(repository)
+func (r *Router) RouterEmailScore(repository repositories.EmailScoreRepository) {
+	controller := controllers.NewEmailScoreController(repository)
 
-	r.router.Route("/product", func(route chi.Router) {
-		route.Post("/", handler.Post)
-		route.Get("/", handler.Get)
-		route.Get("/{ID}", handler.Get)
-		route.Put("/{ID}", handler.Put)
-		route.Delete("/{ID}", handler.Delete)
+	r.router.Route("/email-score", func(route chi.Router) {
+		route.Post("/find", controller.FindByEmails)
+		route.Get("/by-email/", controller.GetByEmail)
+		route.Put("/consolidate-score/", controller.ConsolidateScore)
 	})
 }
 

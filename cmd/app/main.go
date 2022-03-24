@@ -2,25 +2,32 @@ package main
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/akhil/dynamodb-go-crud-yt/config"
-	"github.com/akhil/dynamodb-go-crud-yt/internal/repository/adapter"
-	"github.com/akhil/dynamodb-go-crud-yt/internal/repository/instance"
-	"github.com/akhil/dynamodb-go-crud-yt/internal/routes"
-	"github.com/akhil/dynamodb-go-crud-yt/internal/rules"
-	RulesProduct "github.com/akhil/dynamodb-go-crud-yt/internal/rules/product"
-	"github.com/akhil/dynamodb-go-crud-yt/utils/logger"
 	"log"
 	"net/http"
+
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/config"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/http/routes"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/infra/repositories/storedynamodb"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/migrations"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/utils/logger"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 func main() {
 	configs := config.GetConfig()
 
-	connection := instance.GetConnection()
-	repository := adapter.NewAdapter(connection)
+	connection := storedynamodb.GetConnection()
+
+	emailScoreRepository := storedynamodb.NewEmailScoreDynamoRepo(connection)
+	healthRepository := storedynamodb.NewHealthDynamoRepo(connection)
 
 	logger.INFO("Waiting service starting.... ", nil)
+
+	// params := &dynamodb.DeleteTableInput{
+	// 	TableName: aws.String("email_score"),
+	// }
+	// _, err := connection.DeleteTable(params)
+	// fmt.Println(err)
 
 	errors := Migrate(connection)
 	if len(errors) > 0 {
@@ -31,7 +38,7 @@ func main() {
 	logger.PANIC("", checkTables(connection))
 
 	port := fmt.Sprintf(":%v", configs.Port)
-	router := routes.NewRouter().SetRouters(repository)
+	router := routes.NewRouter().SetRouters(emailScoreRepository, healthRepository)
 	logger.INFO("Service running on port ", port)
 
 	server := http.ListenAndServe(port, router)
@@ -41,13 +48,13 @@ func main() {
 func Migrate(connection *dynamodb.DynamoDB) []error {
 	var errors []error
 
-	callMigrateAndAppendError(&errors, connection, &RulesProduct.Rules{})
+	callMigrateAndAppendError(&errors, connection, &migrations.Migration{})
 
 	return errors
 }
 
-func callMigrateAndAppendError(errors *[]error, connection *dynamodb.DynamoDB, rule rules.Interface) {
-	err := rule.Migrate(connection)
+func callMigrateAndAppendError(errors *[]error, connection *dynamodb.DynamoDB, migration migrations.Migrations) {
+	err := migration.Migrate(connection)
 	if err != nil {
 		*errors = append(*errors, err)
 	}

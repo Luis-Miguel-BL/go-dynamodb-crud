@@ -1,8 +1,9 @@
 package entities
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Interface interface {
@@ -11,17 +12,16 @@ type Interface interface {
 	SetUpdatedAt()
 	TableName() string
 	GetMap() map[string]interface{}
-	GetFilterId() map[string]interface{}
 }
 
 type Base struct {
-	ID        uuid.UUID `json:"_id"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        string    `json:"_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (b *Base) GenerateID() {
-	b.ID = uuid.New()
+	b.ID = uuid.New().String()
 }
 
 func (b *Base) SetCreatedAt() {
@@ -30,8 +30,4 @@ func (b *Base) SetCreatedAt() {
 
 func (b *Base) SetUpdatedAt() {
 	b.UpdatedAt = time.Now()
-}
-
-func GetTimeFormat() string {
-	return "2006-01-02T15:04:05-0700"
 }
