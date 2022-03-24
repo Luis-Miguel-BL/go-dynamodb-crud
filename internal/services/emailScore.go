@@ -24,24 +24,24 @@ func NewEmailScoreService(repository repositories.EmailScoreRepository) EmailSco
 	return &EmailScoreService{repository: repository}
 }
 
-func (c *EmailScoreService) GetByEmail(email string) (emailScore entities.EmailScore, err error) {
-	return c.repository.GetByEmail(email)
+func (e *EmailScoreService) GetByEmail(email string) (emailScore entities.EmailScore, err error) {
+	return e.repository.GetByEmail(email)
 }
 
-func (c *EmailScoreService) ListByEmails(emails []string) (emailsScore []entities.EmailScore, err error) {
+func (e *EmailScoreService) ListByEmails(emails []string) (emailsScore []entities.EmailScore, err error) {
 
-	return c.repository.ListByEmails(emails)
+	return e.repository.ListByEmails(emails)
 
 }
 
-func (c *EmailScoreService) Create(entity *entities.EmailScore) (string, error) {
+func (e *EmailScoreService) Create(entity *entities.EmailScore) (string, error) {
 	setDefaultValues(entity)
-	return c.repository.Create(entity)
+	return e.repository.Create(entity)
 }
 
-func (c *EmailScoreService) ConsolidateScore(consolidateScore *vo.ConsolidateEmailScore) error {
+func (e *EmailScoreService) ConsolidateScore(consolidateScore *vo.ConsolidateEmailScore) error {
 
-	oldEmailScore, err := c.GetByEmail(consolidateScore.Email)
+	oldEmailScore, err := e.GetByEmail(consolidateScore.Email)
 	if err != nil && oldEmailScore.ID != "" {
 		return err
 	}
@@ -61,7 +61,7 @@ func (c *EmailScoreService) ConsolidateScore(consolidateScore *vo.ConsolidateEma
 
 	newEmailScore.ConsolidateScore(*consolidateScore)
 
-	err = c.repository.Update(newEmailScore)
+	err = e.repository.Update(newEmailScore)
 
 	return err
 }

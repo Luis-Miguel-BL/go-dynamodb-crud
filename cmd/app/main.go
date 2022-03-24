@@ -9,6 +9,7 @@ import (
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/http/routes"
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/infra/repositories/storedynamodb"
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/migrations"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/services"
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/utils/logger"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
@@ -19,7 +20,10 @@ func main() {
 	connection := storedynamodb.GetConnection()
 
 	emailScoreRepository := storedynamodb.NewEmailScoreDynamoRepo(connection)
+	emailScoreService := services.NewEmailScoreService(emailScoreRepository)
+
 	healthRepository := storedynamodb.NewHealthDynamoRepo(connection)
+	healthService := services.NewHealthService(healthRepository)
 
 	logger.INFO("Waiting service starting.... ", nil)
 
@@ -38,7 +42,7 @@ func main() {
 	logger.PANIC("", checkTables(connection))
 
 	port := fmt.Sprintf(":%v", configs.Port)
-	router := routes.NewRouter().SetRouters(emailScoreRepository, healthRepository)
+	router := routes.NewRouter().SetRouters(emailScoreService, healthService)
 	logger.INFO("Service running on port ", port)
 
 	server := http.ListenAndServe(port, router)

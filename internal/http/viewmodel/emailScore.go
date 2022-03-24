@@ -23,6 +23,7 @@ func ValidateConsolidateScore(r *http.Request) (bodyParsed *vo.ConsolidateEmailS
 	if err != nil {
 		return bodyParsed, err
 	}
+
 	return bodyParsed, err
 }
 

@@ -4,22 +4,22 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/repositories"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/services"
 	HttpStatus "github.com/Luis-Miguel-BL/go-dynamodb-crud/utils/http"
 )
 
 type HealthController struct {
-	Repository repositories.HealthRepository
+	Service services.HealthInterface
 }
 
-func NewHealthController(repository repositories.HealthRepository) *HealthController {
+func NewHealthController(service services.HealthInterface) *HealthController {
 	return &HealthController{
-		Repository: repository,
+		Service: service,
 	}
 }
 
 func (h *HealthController) Get(w http.ResponseWriter, r *http.Request) {
-	if !h.Repository.Health() {
+	if !h.Service.Health() {
 		HttpStatus.StatusInternalServerError(w, r, errors.New("Relational database not alive"))
 		return
 	}

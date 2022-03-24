@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/http/viewmodel"
-	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/repositories"
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/services"
 	HttpStatus "github.com/Luis-Miguel-BL/go-dynamodb-crud/utils/http"
 )
@@ -13,9 +12,9 @@ type EmailScoreController struct {
 	Service services.EmailScoreInterface
 }
 
-func NewEmailScoreController(repository repositories.EmailScoreRepository) *EmailScoreController {
+func NewEmailScoreController(service services.EmailScoreInterface) *EmailScoreController {
 	return &EmailScoreController{
-		Service: services.NewEmailScoreService(repository),
+		Service: service,
 	}
 }
 

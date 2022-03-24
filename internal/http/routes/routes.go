@@ -3,7 +3,7 @@ package routes
 import (
 	ServerConfig "github.com/Luis-Miguel-BL/go-dynamodb-crud/config"
 	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/http/controllers"
-	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/repositories"
+	"github.com/Luis-Miguel-BL/go-dynamodb-crud/internal/services"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -20,11 +20,11 @@ func NewRouter() *Router {
 	}
 }
 
-func (r *Router) SetRouters(emailScoreRepository repositories.EmailScoreRepository, heathRepository repositories.HealthRepository) *chi.Mux {
+func (r *Router) SetRouters(emailScoreService services.EmailScoreInterface, heathService services.HealthInterface) *chi.Mux {
 	r.setConfigsRouters()
 
-	r.RouterEmailScore(emailScoreRepository)
-	r.RouterHealth(heathRepository)
+	r.RouterEmailScore(emailScoreService)
+	r.RouterHealth(heathService)
 
 	return r.router
 }
@@ -38,16 +38,16 @@ func (r *Router) setConfigsRouters() {
 	r.EnableRealIP()
 }
 
-func (r *Router) RouterHealth(repository repositories.HealthRepository) {
-	controller := controllers.NewHealthController(repository)
+func (r *Router) RouterHealth(service services.HealthInterface) {
+	controller := controllers.NewHealthController(service)
 
 	r.router.Route("/health", func(route chi.Router) {
 		route.Get("/", controller.Get)
 	})
 }
 
-func (r *Router) RouterEmailScore(repository repositories.EmailScoreRepository) {
-	controller := controllers.NewEmailScoreController(repository)
+func (r *Router) RouterEmailScore(service services.EmailScoreInterface) {
+	controller := controllers.NewEmailScoreController(service)
 
 	r.router.Route("/email-score", func(route chi.Router) {
 		route.Post("/find", controller.FindByEmails)

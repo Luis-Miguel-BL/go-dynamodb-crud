@@ -8,8 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
-
-	"github.com/fatih/structs"
 )
 
 type EmailScoreDynamoRepo struct {
@@ -121,11 +119,29 @@ func (repository *EmailScoreDynamoRepo) CreateOrUpdate(entity interface{}, table
 }
 
 func (repository *EmailScoreDynamoRepo) Create(entity *entities.EmailScore) (id string, err error) {
-	_, err = repository.CreateOrUpdate(structs.Map(entity), repository.tableName)
+	_, err = repository.CreateOrUpdate(structToMap(entity), repository.tableName)
 	return entity.ID, err
 }
 
 func (repository *EmailScoreDynamoRepo) Update(entity *entities.EmailScore) error {
-	_, err := repository.CreateOrUpdate(structs.Map(entity), repository.tableName)
+	_, err := repository.CreateOrUpdate(structToMap(entity), repository.tableName)
 	return err
+}
+
+func structToMap(emailScore *entities.EmailScore) map[string]interface{} {
+	return map[string]interface{}{
+		"_id":             emailScore.ID,
+		"email":           emailScore.Email,
+		"created_at":      emailScore.CreatedAt,
+		"updated_at":      emailScore.UpdatedAt,
+		"score":           emailScore.Score,
+		"sent_count":      emailScore.SentCount,
+		"delivered_count": emailScore.DeliveredCount,
+		"opened_count":    emailScore.OpenedCount,
+		"bounced":         emailScore.Bounced,
+		"mx_validated":    emailScore.MxValidated,
+		"last_sent":       emailScore.LastSent,
+		"last_delivery":   emailScore.LastDelivery,
+		"last_opened":     emailScore.LastOpened,
+	}
 }
